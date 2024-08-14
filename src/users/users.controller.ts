@@ -1,6 +1,13 @@
-import { Body, ConflictException, Controller, Post } from '@nestjs/common';
-import { Public } from 'src/auth/decorators/public.decorator';
-import { IResponse } from 'src/types';
+import {
+  Body,
+  ConflictException,
+  Controller,
+  Delete,
+  Post,
+  Request,
+} from '@nestjs/common';
+import { Public } from '../auth/decorators/public.decorator';
+import { IResponse } from '../types';
 import { UsersService } from './users.service';
 import { UserResponseDto } from './user.dto';
 
@@ -20,6 +27,17 @@ export class UsersController {
     },
   ): Promise<IResponse<UserResponseDto>> {
     const response = await this.userService.create(register);
+
+    if (response.error) {
+      throw new ConflictException(response.message);
+    }
+
+    return response;
+  }
+
+  @Delete('remove')
+  async remove(@Request() req): Promise<IResponse<UserResponseDto>> {
+    const response = await this.userService.remove(req.user.sub);
 
     if (response.error) {
       throw new ConflictException(response.message);

@@ -51,6 +51,24 @@ export class UsersService {
     }
   }
 
+  async remove(id: number): Promise<IResponse<UserResponseDto>> {
+    try {
+      await this.usersRepository.softDelete(id);
+      return {
+        error: false,
+        data: null,
+        message: 'User removed successfully',
+      };
+    } catch (error) {
+      console.error(error.message);
+      return {
+        error: true,
+        data: null,
+        message: 'Something went wrong',
+      };
+    }
+  }
+
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
   }
@@ -61,9 +79,5 @@ export class UsersService {
 
   findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ email });
-  }
-
-  async remove(id: number): Promise<void> {
-    await this.usersRepository.delete(id);
   }
 }
