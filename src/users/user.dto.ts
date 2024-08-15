@@ -29,7 +29,9 @@ export class UserResponseDto {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
-  isActive: boolean;
+  isPasswordSet: boolean;
+  isEmailConfirmed: boolean;
+  isPhoneConfirmed: boolean;
   role: string;
 
   constructor(user: User) {
@@ -37,8 +39,10 @@ export class UserResponseDto {
     this.email = user.email;
     this.firstName = user.firstName;
     this.lastName = user.lastName;
-    this.isActive = user.isActive;
     this.role = user.role;
+    this.isEmailConfirmed = user.isEmailConfirmed;
+    this.isPhoneConfirmed = user.isPhoneConfirmed;
+    this.isPasswordSet = user.isPasswordSet;
     this.createdAt = user.createdAt;
     this.updatedAt = user.updatedAt;
     this.deletedAt = user.deletedAt;

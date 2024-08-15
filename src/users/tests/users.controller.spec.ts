@@ -13,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthService } from '../../auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConflictException } from '@nestjs/common';
+import exp from 'constants';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -55,9 +56,9 @@ describe('UsersController', () => {
 
   afterAll(async () => {
     await usersRepository.query('SET FOREIGN_KEY_CHECKS = 0;');
-    await usersRepository.clear(); // Limpa os dados da tabela User após todos os testes
+    await usersRepository.clear();
     await usersRepository.query('SET FOREIGN_KEY_CHECKS = 1;');
-    await dataSource.destroy(); // Fecha a conexão com o banco de dados
+    await dataSource.destroy();
   });
 
   const testUser = {
@@ -66,8 +67,6 @@ describe('UsersController', () => {
     firstName: 'test',
     lastName: 'test',
   } as CreateUserDto;
-
-  let testUserId: number;
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
@@ -95,6 +94,35 @@ describe('UsersController', () => {
     expect(jwtToken).toBeDefined();
   });
 
+  it('should update a user in the database', async () => {
+    const user = await usersRepository.findOne({
+      where: { email: testUser.email },
+    });
+
+    const payloadMock = {
+      user: {
+        sub: user.id,
+        email: user.email,
+      },
+      body: {
+        firstName: 'updated',
+        lastName: 'updated',
+        deletedAt: null,
+      },
+    };
+
+    const updatedUser = await controller.update(payloadMock);
+
+    expect(updatedUser.data.firstName).toBe('updated');
+    expect(updatedUser.data.lastName).toBe('updated');
+    expect(updatedUser.data.deletedAt).toBeNull();
+  });
+
+  it('should return the user from the database by id', async () => {
+    const result = await controller.getProfile(1);
+    expect(result.data.email).toBe(testUser.email);
+  });
+
   it('should delete the user from the database', async () => {
     const user = await usersRepository.findOne({
       where: { email: testUser.email },
@@ -106,7 +134,6 @@ describe('UsersController', () => {
         email: user.email,
       },
     };
-    testUserId = user.id;
     await controller.remove(payloadMock);
 
     const deletedUser = await service.findOne(user.id);

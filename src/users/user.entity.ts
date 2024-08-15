@@ -30,8 +30,14 @@ export class User {
   @Column({ default: 'user' })
   role: string;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column({ default: false })
+  isEmailConfirmed: boolean;
+
+  @Column({ default: false })
+  isPhoneConfirmed: boolean;
+
+  @Column({ default: false })
+  isPasswordSet: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

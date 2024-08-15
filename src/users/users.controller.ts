@@ -3,7 +3,10 @@ import {
   ConflictException,
   Controller,
   Delete,
+  Get,
+  Param,
   Post,
+  Put,
   Request,
 } from '@nestjs/common';
 import { Public } from '../auth/decorators/public.decorator';
@@ -14,6 +17,20 @@ import { UserResponseDto } from './user.dto';
 @Controller('users')
 export class UsersController {
   constructor(private userService: UsersService) {}
+
+  @Public()
+  @Get('profile/:id')
+  async getProfile(
+    @Param('id') id: number,
+  ): Promise<IResponse<UserResponseDto>> {
+    const response = await this.userService.getProfileById(id);
+
+    if (response.error) {
+      throw new ConflictException(response.message);
+    }
+
+    return response;
+  }
 
   @Public()
   @Post('register')
@@ -27,6 +44,17 @@ export class UsersController {
     },
   ): Promise<IResponse<UserResponseDto>> {
     const response = await this.userService.create(register);
+
+    if (response.error) {
+      throw new ConflictException(response.message);
+    }
+
+    return response;
+  }
+
+  @Put('update')
+  async update(@Request() req): Promise<IResponse<UserResponseDto>> {
+    const response = await this.userService.update(req.user.sub, req.body);
 
     if (response.error) {
       throw new ConflictException(response.message);
