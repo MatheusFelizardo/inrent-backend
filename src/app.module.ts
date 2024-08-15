@@ -10,7 +10,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { User } from './users/user.entity';
+import { User } from './users/entities/user.entity';
+import { Property } from './properties/entities/property.entity';
+import { PropertyPhotos } from './properties/entities/property-photos.entity';
+import { Profile } from './users/entities/profile.entity';
 
 @Module({
   imports: [
@@ -22,7 +25,7 @@ import { User } from './users/user.entity';
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [User],
+      entities: [User, Profile, Property, PropertyPhotos],
       synchronize: true,
     }),
     AuthModule,

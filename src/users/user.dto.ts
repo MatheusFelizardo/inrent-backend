@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
-import { User } from './user.entity';
+import { User } from './entities/user.entity';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -11,21 +11,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   @MinLength(6)
   password: string;
-
-  @IsNotEmpty()
-  @Expose({ name: 'first_name' })
-  firstName: string;
-
-  @IsNotEmpty()
-  @Expose({ name: 'last_name' })
-  lastName: string;
 }
 
 export class UserResponseDto {
   id: number;
   email: string;
-  firstName: string;
-  lastName: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date;
@@ -37,8 +27,6 @@ export class UserResponseDto {
   constructor(user: User) {
     this.id = user.id;
     this.email = user.email;
-    this.firstName = user.firstName;
-    this.lastName = user.lastName;
     this.role = user.role;
     this.isEmailConfirmed = user.isEmailConfirmed;
     this.isPhoneConfirmed = user.isPhoneConfirmed;

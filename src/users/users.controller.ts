@@ -39,8 +39,6 @@ export class UsersController {
     register: {
       email: string;
       password: string;
-      firstName: string;
-      lastName: string;
     },
   ): Promise<IResponse<UserResponseDto>> {
     const response = await this.userService.create(register);

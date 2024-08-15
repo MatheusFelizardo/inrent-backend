@@ -7,13 +7,15 @@ import {
   TypeOrmModule,
   TypeOrmModuleOptions,
 } from '@nestjs/typeorm';
-import { User } from '../user.entity';
+import { User } from '../entities/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AuthService } from '../../auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConflictException } from '@nestjs/common';
-import exp from 'constants';
+import { Profile } from '../entities/profile.entity';
+import { Property } from '../../properties/entities/property.entity';
+import { PropertyPhotos } from '../../properties/entities/property-photos.entity';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -34,7 +36,7 @@ describe('UsersController', () => {
           username: process.env.DB_USER,
           password: process.env.DB_PASSWORD,
           database: 'inrent-test',
-          entities: [User],
+          entities: [User, Profile, Property, PropertyPhotos],
           synchronize: true,
         } as TypeOrmModuleOptions),
         TypeOrmModule.forFeature([User]),
@@ -64,8 +66,6 @@ describe('UsersController', () => {
   const testUser = {
     email: 'test@test.com',
     password: 'password',
-    firstName: 'test',
-    lastName: 'test',
   } as CreateUserDto;
 
   it('should be defined', () => {
@@ -105,16 +105,11 @@ describe('UsersController', () => {
         email: user.email,
       },
       body: {
-        firstName: 'updated',
-        lastName: 'updated',
         deletedAt: null,
       },
     };
 
     const updatedUser = await controller.update(payloadMock);
-
-    expect(updatedUser.data.firstName).toBe('updated');
-    expect(updatedUser.data.lastName).toBe('updated');
     expect(updatedUser.data.deletedAt).toBeNull();
   });
 

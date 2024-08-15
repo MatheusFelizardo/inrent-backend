@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto, UserResponseDto } from './user.dto';
 import { IResponse } from 'src/types';
@@ -58,8 +58,6 @@ export class UsersService {
       const user = new User();
       user.email = email;
       user.password = hashedPassword;
-      user.firstName = createUserDto.firstName;
-      user.lastName = createUserDto.lastName;
       user.isPasswordSet = true;
       await this.usersRepository.save(user);
 
@@ -92,7 +90,7 @@ export class UsersService {
         };
       }
 
-      const { email, password, firstName, lastName, deletedAt } = updateUserDto;
+      const { password, deletedAt } = updateUserDto;
 
       if (updateUserDto.password) {
         const salt = await bcrypt.genSalt();
@@ -100,9 +98,6 @@ export class UsersService {
         user.password = hashedPassword;
       }
       if (updateUserDto.deletedAt) user.deletedAt = deletedAt;
-      if (updateUserDto.email) user.email = email;
-      if (updateUserDto.firstName) user.firstName = firstName;
-      if (updateUserDto.lastName) user.lastName = lastName;
 
       await this.usersRepository.save(user);
 

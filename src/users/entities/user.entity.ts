@@ -5,9 +5,13 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
   CreateDateColumn,
+  OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
+import { Property } from '../../properties/entities/property.entity';
+import { Profile } from './profile.entity';
 
 @Entity()
 export class User {
@@ -20,12 +24,6 @@ export class User {
   @Exclude()
   @Column()
   password: string;
-
-  @Column()
-  firstName: string;
-
-  @Column()
-  lastName: string;
 
   @Column({ default: 'user' })
   role: string;
@@ -47,6 +45,12 @@ export class User {
 
   @DeleteDateColumn()
   deletedAt?: Date;
+
+  @OneToOne(() => Profile, (profile) => profile.user)
+  profile: Profile;
+
+  @OneToMany(() => Property, (property) => property.user)
+  properties: Property[];
 
   async validatePassword(password: string): Promise<boolean> {
     return bcrypt.compare(password, this.password);
