@@ -12,7 +12,7 @@ import {
 import { Public } from '../auth/decorators/public.decorator';
 import { IResponse } from '../types';
 import { UsersService } from './users.service';
-import { UserResponseDto } from './user.dto';
+import { UserResponseDto } from './dto/user.dto';
 
 @Controller('users')
 export class UsersController {

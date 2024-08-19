@@ -46,22 +46,22 @@ export class Property {
   })
   status: string;
 
-  @Column({ nullable: true })
+  @Column()
   bedrooms: number;
 
-  @Column({ nullable: true })
+  @Column()
   bathrooms: number;
 
-  @Column()
+  @Column({ nullable: true })
   parking: number;
 
   @Column({ nullable: true })
   area: number;
 
-  @Column()
+  @Column({ default: false })
   furnished: boolean;
 
-  @Column({ nullable: true })
+  @Column({ default: false })
   acceptAnimals: boolean;
 
   @Column()
@@ -70,7 +70,7 @@ export class Property {
   @Column({ nullable: true })
   addressComplement: string;
 
-  @Column()
+  @Column({ nullable: true })
   addressNumber: number;
 
   @Column()
@@ -88,7 +88,7 @@ export class Property {
   @Column('decimal')
   price: number;
 
-  @Column()
+  @Column({ default: true })
   available: boolean;
 
   @Column({ default: false })
