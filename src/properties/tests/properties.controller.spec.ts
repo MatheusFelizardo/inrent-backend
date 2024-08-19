@@ -80,6 +80,8 @@ describe('PropertiesController', () => {
     userId: null,
   } as CreatePropertyDto;
 
+  let savedProperty: PropertyResponseDto;
+
   beforeEach(async () => {
     const hasUser = await usersService.findByEmail('test@test.com');
 
@@ -93,7 +95,7 @@ describe('PropertiesController', () => {
       email: 'test@test.com',
       password: '123456',
     });
-    userId = response.data.id;
+    userId = response?.data?.id;
     propertyObjectMock.userId = userId;
   });
 
@@ -130,12 +132,12 @@ describe('PropertiesController', () => {
     expect(response.data[0].title).toBe('Property 1');
   });
 
-  it('should return an error if no properties are found', async () => {
+  it('should return a message if no properties are found', async () => {
     jest.spyOn(repository, 'find').mockResolvedValue([]);
 
     const response = await controller.findAll();
 
-    expect(response.error).toBe(true);
+    expect(response.error).toBe(false);
     expect(response.message).toBe('No properties found');
     expect(response.data).toBeNull();
   });
@@ -154,8 +156,9 @@ describe('PropertiesController', () => {
     expect(response.data).toBeNull();
   });
 
-  it('should be able to create a new property', async () => {
+  it('should create a new property', async () => {
     const response = await controller.create(propertyObjectMock);
+    savedProperty = response.data;
 
     expect(response.error).toBe(false);
     expect(response.message).toBe('Property created');
@@ -177,14 +180,68 @@ describe('PropertiesController', () => {
   });
 
   it('should update a property', async () => {
-    const property = await repository.save(propertyObjectMock);
-
-    const updatedProperty = await controller.update(property.id, {
+    const updatedProperty = await controller.update(savedProperty.id, {
       title: 'Updated title',
     } as CreatePropertyDto);
 
     expect(updatedProperty.error).toBe(false);
     expect(updatedProperty.message).toBe('Property updated');
     expect(updatedProperty.data.title).toBe('Updated title');
+  });
+
+  it('should return an error if there is a database issue updating a property', async () => {
+    jest
+      .spyOn(repository, 'save')
+      .mockRejectedValue(new Error('Database error'));
+
+    const response = await controller.update(savedProperty.id, {
+      title: 'Updated title',
+    } as CreatePropertyDto);
+
+    expect(response.error).toBe(true);
+    expect(response.message).toBe(
+      'Some error ocurred while updating the property',
+    );
+    expect(response.data).toBeNull();
+  });
+
+  it('should return a message if the property does not exist while updating', async () => {
+    const response = await controller.update(999, {
+      title: 'Updated title',
+    } as CreatePropertyDto);
+
+    expect(response.error).toBe(true);
+    expect(response.message).toBe('Property not found');
+    expect(response.data).toBeNull();
+  });
+
+  it('should return an error if there is a database issue deleting a property', async () => {
+    jest
+      .spyOn(repository, 'delete')
+      .mockRejectedValue(new Error('Database error'));
+
+    const response = await controller.delete(savedProperty.id);
+
+    expect(response.error).toBe(true);
+    expect(response.message).toBe(
+      'Some error ocurred while deleting the property',
+    );
+    expect(response.data).toBeNull();
+  });
+
+  it('should return a message if the property does not exist while deleting', async () => {
+    const response = await controller.delete(999);
+
+    expect(response.error).toBe(true);
+    expect(response.message).toBe('Property not found');
+    expect(response.data).toBeNull();
+  });
+
+  it('should delete a property', async () => {
+    const response = await controller.delete(savedProperty.id);
+
+    expect(response.error).toBe(false);
+    expect(response.message).toBe('Property deleted');
+    expect(response.data).toBeNull();
   });
 });

@@ -17,7 +17,7 @@ export class PropertiesService {
       const properties = await this.propertyRepository.find();
 
       if (properties.length === 0) {
-        return { error: true, message: 'No properties found', data: null };
+        return { error: false, message: 'No properties found', data: null };
       }
 
       const propertiesDto = properties.map((property) => {
@@ -88,6 +88,29 @@ export class PropertiesService {
       return {
         error: true,
         message: 'Some error ocurred while updating the property',
+        data: null,
+      };
+    }
+  }
+
+  async delete(id: number): Promise<IResponse<null>> {
+    try {
+      const property = await this.propertyRepository.findOne({
+        where: { id },
+      });
+
+      if (!property) {
+        return { error: true, message: 'Property not found', data: null };
+      }
+
+      await this.propertyRepository.delete(id);
+
+      return { error: false, message: 'Property deleted', data: null };
+    } catch (error) {
+      console.error(error.message);
+      return {
+        error: true,
+        message: 'Some error ocurred while deleting the property',
         data: null,
       };
     }

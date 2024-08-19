@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { PropertiesService } from './properties.service';
 import { IResponse } from 'src/types';
 import { CreatePropertyDto, PropertyResponseDto } from './dto/property.dto';
@@ -25,5 +33,10 @@ export class PropertiesController {
     @Body() createPropertyDto: CreatePropertyDto,
   ): Promise<IResponse<PropertyResponseDto>> {
     return await this.propertiesService.update(id, createPropertyDto);
+  }
+
+  @Delete('delete/:id')
+  async delete(@Param('id') id: number): Promise<IResponse<null>> {
+    return await this.propertiesService.delete(id);
   }
 }
