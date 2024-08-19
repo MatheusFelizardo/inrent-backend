@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
-import { User } from './entities/user.entity';
+import { User } from '../entities/user.entity';
 
 export class CreateUserDto {
   @IsNotEmpty()
