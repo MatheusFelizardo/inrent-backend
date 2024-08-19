@@ -20,6 +20,7 @@ export class UsersController {
 
   @Public()
   @Get('profile/:id')
+  // for now it brings the user. Update it to bring the profile!
   async getProfile(
     @Param('id') id: number,
   ): Promise<IResponse<UserResponseDto>> {

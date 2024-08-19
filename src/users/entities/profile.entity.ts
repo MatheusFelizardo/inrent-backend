@@ -21,9 +21,6 @@ export class Profile {
   @Column()
   userId: number;
 
-  @Column({ unique: true })
-  email: string;
-
   @Column()
   name: string;
 

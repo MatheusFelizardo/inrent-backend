@@ -21,12 +21,20 @@ export class AuthService {
       await this.usersService.reactivate(user.id);
     }
 
+    if (!user) {
+      throw new UnauthorizedException({
+        error: true,
+        message: 'Invalid email',
+        data: null,
+      });
+    }
+
     const isPasswordMatching = await bcrypt.compare(pass, user.password);
 
     if (!isPasswordMatching) {
       throw new UnauthorizedException({
         error: true,
-        message: 'Invalid email or password',
+        message: 'Invalid password',
         data: null,
       });
     }
