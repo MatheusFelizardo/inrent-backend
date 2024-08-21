@@ -4,12 +4,17 @@ import { Property } from './entities/property.entity';
 import { Repository } from 'typeorm';
 import { IResponse } from 'src/types';
 import { CreatePropertyDto, PropertyResponseDto } from './dto/property.dto';
+import { existsSync, mkdirSync, promises } from 'fs';
+import { PropertyPhotos } from './entities/property-photos.entity';
+import { PropertyPhotoResponseDto } from './dto/propertyPhotos.dto';
 
 @Injectable()
 export class PropertiesService {
   constructor(
     @InjectRepository(Property)
     private propertyRepository: Repository<Property>,
+    @InjectRepository(PropertyPhotos)
+    private propertyPhotosRepository: Repository<PropertyPhotos>,
   ) {}
 
   async findAll(): Promise<IResponse<PropertyResponseDto[]>> {
@@ -55,6 +60,61 @@ export class PropertiesService {
       return {
         error: true,
         message: 'Some error ocurred while creating the property',
+        data: null,
+      };
+    }
+  }
+
+  async uploadPhoto(
+    id: number,
+    photos: Array<Express.Multer.File>,
+    metadata: {
+      photo: string;
+      description?: string;
+      showInGallery?: boolean;
+      labels?: string[];
+    }[],
+  ): Promise<IResponse<PropertyPhotoResponseDto[]>> {
+    try {
+      const property = await this.propertyRepository.findOne({
+        where: { id },
+      });
+
+      if (!property) {
+        return { error: true, message: 'Property not found', data: null };
+      }
+
+      const savedPhotos = [] as PropertyPhotoResponseDto[];
+      for (const photo of photos) {
+        const path = await this.movePhotoToFolder(photo, id);
+        const originalName = photo.originalname;
+        const savedPhotoMetadata = metadata.filter(
+          (data) => data.photo === originalName,
+        )[0];
+        const { description, showInGallery, labels } = savedPhotoMetadata;
+
+        const propertyPhoto = this.propertyPhotosRepository.create({
+          propertyId: id,
+          photoUrl: path,
+          description,
+          showInGallery,
+        });
+        const savedPhoto =
+          await this.propertyPhotosRepository.save(propertyPhoto);
+
+        savedPhotos.push(savedPhoto);
+      }
+
+      return {
+        error: false,
+        message: 'Photos uploaded',
+        data: savedPhotos,
+      };
+    } catch (error) {
+      console.error(error.message);
+      return {
+        error: true,
+        message: 'Some error ocurred while uploading the photo',
         data: null,
       };
     }
@@ -118,5 +178,23 @@ export class PropertiesService {
 
   generateSlug(property: Property): string {
     return `${property.id}?type=${property.type}&city=${property.city}&bathrooms=${property.bathrooms}&bedrooms=${property.bedrooms}&area=${property.area}`;
+  }
+
+  async movePhotoToFolder(
+    photo: Express.Multer.File,
+    id: number,
+  ): Promise<string> {
+    const path = `./uploads/properties/${id}`;
+    const hasFolder = existsSync(path);
+    if (!hasFolder) {
+      mkdirSync(path);
+    }
+
+    const photoFormat = photo.mimetype.split('/')[1];
+    const photoName = `${photo.path.replace('uploads\\', '')}.${photoFormat}`;
+    const newPath = `${path}/${photoName}`;
+    await promises.rename(photo.path, newPath);
+
+    return `/properties/${id}/${photoName}`;
   }
 }

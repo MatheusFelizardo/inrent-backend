@@ -27,7 +27,7 @@ export class PropertyPhotos {
   photoUrl: string;
 
   @Column()
-  altText: string;
+  description: string;
 
   @Column({ default: true })
   showInGallery: boolean;
