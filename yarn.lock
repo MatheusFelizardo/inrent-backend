@@ -771,7 +771,7 @@
 
 "@nestjs/serve-static@^4.0.2":
   version "4.0.2"
-  resolved "https://registry.yarnpkg.com/@nestjs/serve-static/-/serve-static-4.0.2.tgz#f003bbd90922bdc73d0261edacf001dfef174c96"
+  resolved "https://registry.npmjs.org/@nestjs/serve-static/-/serve-static-4.0.2.tgz"
   integrity sha512-cT0vdWN5ar7jDI2NKbhf4LcwJzU4vS5sVpMkVrHuyLcltbrz6JdGi1TfIMMatP2pNiq5Ie/uUdPSFDVaZX/URQ==
   dependencies:
     path-to-regexp "0.2.5"
@@ -1031,7 +1031,7 @@
 
 "@types/multer@^1.4.11":
   version "1.4.11"
-  resolved "https://registry.yarnpkg.com/@types/multer/-/multer-1.4.11.tgz#c70792670513b4af1159a2b60bf48cc932af55c5"
+  resolved "https://registry.npmjs.org/@types/multer/-/multer-1.4.11.tgz"
   integrity sha512-svK240gr6LVWvv3YGyhLlA+6LRRWA4mnGIU7RcNmgjBYFl6665wcXrRfxGp5tEPVHUNm5FMcmq7too9bxCwX/w==
   dependencies:
     "@types/express" "*"
@@ -1615,10 +1615,11 @@ babel-preset-jest@^29.6.3:
     "@nestjs/config" "^3.2.3"
     "@nestjs/core" "^10.0.0"
     "@nestjs/platform-express" "^10.0.0"
-    backend "file:../../../../../AppData/Local/Yarn/Cache/v6/npm-backend-0.0.1-c86a5262-226b-4623-bbc9-28031380c23a-1724262030717/node_modules/backend"
+    backend "file:../../../../../AppData/Local/Yarn/Cache/v6/npm-backend-0.0.1-1815f0a8-7de1-4a27-8734-f554b9bd0708-1724270906476/node_modules/backend"
     bcrypt "^5.1.1"
     class-transformer "^0.5.1"
     class-validator "^0.14.1"
+    dotenv "^16.4.5"
     reflect-metadata "^0.2.0"
     rxjs "^7.8.1"
 
@@ -2235,7 +2236,7 @@ dotenv-expand@10.0.0:
   resolved "https://registry.npmjs.org/dotenv-expand/-/dotenv-expand-10.0.0.tgz"
   integrity sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==
 
-dotenv@16.4.5, dotenv@^16.0.3:
+dotenv@16.4.5, dotenv@^16.0.3, dotenv@^16.4.5:
   version "16.4.5"
   resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.4.5.tgz"
   integrity sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==
@@ -4368,7 +4369,7 @@ path-to-regexp@0.1.7:
 
 path-to-regexp@0.2.5:
   version "0.2.5"
-  resolved "https://registry.yarnpkg.com/path-to-regexp/-/path-to-regexp-0.2.5.tgz#0b426991e387fc4c675de23557f358715eb66fb0"
+  resolved "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-0.2.5.tgz"
   integrity sha512-l6qtdDPIkmAmzEO6egquYDfqQGPMRNGjYtrU13HAXb3YSRrt7HSb1sJY0pKp6o2bAa86tSB6iwaW2JbthPKr7Q==
 
 path-to-regexp@3.2.0:
