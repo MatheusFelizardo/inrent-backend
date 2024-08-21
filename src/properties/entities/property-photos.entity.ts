@@ -6,8 +6,11 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Property } from './property.entity';
+import { Labels } from './labels.entity';
+import { PhotoLabels } from './photo-labels.entity';
 
 @Entity()
 export class PropertyPhotos {
@@ -37,4 +40,7 @@ export class PropertyPhotos {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(() => PhotoLabels, (photoLabels) => photoLabels.propertyPhoto)
+  photoLabels: PhotoLabels[];
 }
