@@ -7,6 +7,8 @@ import { CreatePropertyDto, PropertyResponseDto } from './dto/property.dto';
 import { existsSync, mkdirSync, promises } from 'fs';
 import { PropertyPhotos } from './entities/property-photos.entity';
 import { PropertyPhotoResponseDto } from './dto/propertyPhotos.dto';
+import { Labels } from './entities/labels.entity';
+import { PhotoLabels } from './entities/photo-labels.entity';
 
 @Injectable()
 export class PropertiesService {
@@ -15,6 +17,8 @@ export class PropertiesService {
     private propertyRepository: Repository<Property>,
     @InjectRepository(PropertyPhotos)
     private propertyPhotosRepository: Repository<PropertyPhotos>,
+    @InjectRepository(PhotoLabels)
+    private photoLabelsRepository: Repository<PhotoLabels>,
   ) {}
 
   async findAll(): Promise<IResponse<PropertyResponseDto[]>> {
@@ -31,7 +35,7 @@ export class PropertiesService {
 
       return { error: false, message: 'Properties found', data: propertiesDto };
     } catch (error) {
-      console.error(error.message);
+      // console.error(error.message);
       return {
         error: true,
         message: 'Some error ocurred while getting the property list',
@@ -56,7 +60,7 @@ export class PropertiesService {
         data: new PropertyResponseDto(updatedProperty),
       };
     } catch (error) {
-      console.error(error.message);
+      // console.error(error.message);
       return {
         error: true,
         message: 'Some error ocurred while creating the property',
@@ -72,7 +76,7 @@ export class PropertiesService {
       photo: string;
       description?: string;
       showInGallery?: boolean;
-      labels?: string[];
+      labels?: number[];
     }[],
   ): Promise<IResponse<PropertyPhotoResponseDto[]>> {
     try {
@@ -84,7 +88,7 @@ export class PropertiesService {
         return { error: true, message: 'Property not found', data: null };
       }
 
-      const savedPhotos = [] as PropertyPhotoResponseDto[];
+      const savedPhotos = [];
       for (const photo of photos) {
         const path = await this.movePhotoToFolder(photo, id);
         const originalName = photo.originalname;
@@ -102,7 +106,20 @@ export class PropertiesService {
         const savedPhoto =
           await this.propertyPhotosRepository.save(propertyPhoto);
 
-        savedPhotos.push(savedPhoto);
+        for (const label of labels) {
+          await this.photoLabelsRepository.save({
+            labelId: label,
+            propertyPhotoId: savedPhoto.id,
+          });
+        }
+
+        const updatedSavedPhotosWithLabels =
+          await this.propertyPhotosRepository.find({
+            where: { id: savedPhoto.id },
+            relations: ['photoLabels'],
+          });
+
+        savedPhotos.push(updatedSavedPhotosWithLabels);
       }
 
       return {
@@ -111,7 +128,7 @@ export class PropertiesService {
         data: savedPhotos,
       };
     } catch (error) {
-      console.error(error.message);
+      // console.error(error.message);
       return {
         error: true,
         message: 'Some error ocurred while uploading the photo',
@@ -144,7 +161,7 @@ export class PropertiesService {
         data: new PropertyResponseDto(updatedProperty),
       };
     } catch (error) {
-      console.error(error.message);
+      // console.error(error);
       return {
         error: true,
         message: 'Some error ocurred while updating the property',
@@ -167,7 +184,7 @@ export class PropertiesService {
 
       return { error: false, message: 'Property deleted', data: null };
     } catch (error) {
-      console.error(error.message);
+      // console.error(error.message);
       return {
         error: true,
         message: 'Some error ocurred while deleting the property',

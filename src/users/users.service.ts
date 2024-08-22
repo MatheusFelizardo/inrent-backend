@@ -124,7 +124,6 @@ export class UsersService {
         message: 'User removed successfully',
       };
     } catch (error) {
-      console.error(error.message);
       return {
         error: true,
         data: null,
@@ -142,7 +141,6 @@ export class UsersService {
         message: 'User reactivated successfully',
       };
     } catch (error) {
-      console.error(error.message);
       return {
         error: true,
         data: null,

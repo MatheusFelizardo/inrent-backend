@@ -57,7 +57,7 @@ export class PropertiesController {
       photo: string;
       description?: string;
       showInGallery?: boolean;
-      labels?: string[];
+      labels?: number[];
     }[];
     return await this.propertiesService.uploadPhoto(id, photos, metadataObj);
   }
