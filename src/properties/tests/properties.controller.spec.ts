@@ -99,6 +99,43 @@ describe('PropertiesController', () => {
 
   let savedProperty: PropertyResponseDto;
 
+  const mockFile = [
+    {
+      originalname: 'test-image.jpg',
+      buffer: Buffer.from('file content'),
+      mimetype: 'image/jpeg',
+      size: 1024,
+      path: 'uploads\\test-image',
+    },
+    {
+      originalname: 'test-image-two.jpg',
+      buffer: Buffer.from('file content'),
+      mimetype: 'image/jpeg',
+      size: 1024,
+      path: 'uploads\\test-image-two',
+    },
+  ] as Express.Multer.File[];
+
+  const mockFileMetadataJson = [
+    {
+      photo: 'test-image.jpg',
+      description: 'Photo 1',
+      showInGallery: true,
+      labels: ['bedroom', 'internal'],
+    },
+    {
+      photo: 'test-image-two.jpg',
+      description: 'Photo 2',
+      showInGallery: false,
+      labels: ['living_room', 'internal'],
+    },
+  ] as {
+    photo: string;
+    description?: string;
+    showInGallery?: boolean;
+    labels?: string[];
+  }[];
+
   beforeEach(async () => {
     const hasUser = await usersService.findByEmail('test@test.com');
 
@@ -254,49 +291,15 @@ describe('PropertiesController', () => {
   });
 
   it('should upload photos to a property', async () => {
-    const mockFile = [
-      {
-        originalname: 'test-image.jpg',
-        buffer: Buffer.from('file content'),
-        mimetype: 'image/jpeg',
-        size: 1024,
-        path: 'uploads\\test-image',
-      },
-      {
-        originalname: 'test-image-two.jpg',
-        buffer: Buffer.from('file content'),
-        mimetype: 'image/jpeg',
-        size: 1024,
-        path: 'uploads\\test-image-two',
-      },
-    ] as Express.Multer.File[];
-
-    // create the file in uploads folder
     mockFile.forEach((file) => {
       writeFileSync(file.path, file.buffer);
     });
 
-    const mockJson = [
-      {
-        photo: 'test-image.jpg',
-        description: 'Photo 1',
-        showInGallery: true,
-        labels: ['bedroom', 'internal'],
-      },
-      {
-        photo: 'test-image-two.jpg',
-        description: 'Photo 2',
-        showInGallery: false,
-        labels: ['living_room', 'internal'],
-      },
-    ] as {
-      photo: string;
-      description?: string;
-      showInGallery?: boolean;
-      labels?: string[];
-    }[];
-
-    const response = await service.uploadPhoto(1, mockFile, mockJson);
+    const response = await service.uploadPhoto(
+      1,
+      mockFile,
+      mockFileMetadataJson,
+    );
 
     expect(response.error).toBe(false);
     expect(response.message).toBe('Photos uploaded');
@@ -310,6 +313,24 @@ describe('PropertiesController', () => {
     });
 
     expect(photos.photos.length).toBe(2);
+  });
+
+  it('should return an error if there is a database issue uploading photos', async () => {
+    jest
+      .spyOn(repository, 'save')
+      .mockRejectedValue(new Error('Database error'));
+
+    const response = await service.uploadPhoto(
+      1,
+      mockFile,
+      mockFileMetadataJson,
+    );
+
+    expect(response.error).toBe(true);
+    expect(response.message).toBe(
+      'Some error ocurred while uploading the photo',
+    );
+    expect(response.data).toBeNull();
   });
 
   it('should return an error if there is a database issue deleting a property', async () => {
