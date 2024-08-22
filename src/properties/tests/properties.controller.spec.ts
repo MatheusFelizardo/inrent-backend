@@ -15,6 +15,10 @@ import { DataSource, Repository } from 'typeorm';
 import { PropertiesService } from '../properties.service';
 import { CreatePropertyDto, PropertyResponseDto } from '../dto/property.dto';
 import { UsersService } from '../../users/users.service';
+import { Labels } from '../entities/labels.entity';
+import { PhotoLabels } from '../entities/photo-labels.entity';
+import { unlinkSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 describe('PropertiesController', () => {
   let controller: PropertiesController;
@@ -35,10 +39,23 @@ describe('PropertiesController', () => {
           username: process.env.DB_USER,
           password: process.env.DB_PASSWORD,
           database: 'inrent-test',
-          entities: [User, Profile, Property, PropertyPhotos],
+          entities: [
+            User,
+            Profile,
+            Property,
+            PropertyPhotos,
+            Labels,
+            PhotoLabels,
+          ],
           synchronize: true,
         } as TypeOrmModuleOptions),
-        TypeOrmModule.forFeature([Property, User]),
+        TypeOrmModule.forFeature([
+          Property,
+          User,
+          Labels,
+          PhotoLabels,
+          PropertyPhotos,
+        ]),
         JwtModule.register({
           secret: process.env.JWT_SECRET,
           signOptions: { expiresIn: '1h' },
@@ -109,6 +126,27 @@ describe('PropertiesController', () => {
     await userRepository.query('SET FOREIGN_KEY_CHECKS = 1;');
 
     await dataSource.destroy();
+
+    try {
+      unlinkSync(
+        join(
+          __dirname,
+          '../../../',
+          'uploads',
+          '/properties/1/test-image.jpeg',
+        ),
+      );
+      unlinkSync(
+        join(
+          __dirname,
+          '../../../',
+          'uploads',
+          '/properties/1/test-image-two.jpeg',
+        ),
+      );
+    } catch (error) {
+      console.error('Error deleting test files:', error);
+    }
   });
 
   it('should be defined', () => {
@@ -213,6 +251,56 @@ describe('PropertiesController', () => {
     expect(response.error).toBe(true);
     expect(response.message).toBe('Property not found');
     expect(response.data).toBeNull();
+  });
+
+  it('should upload photos to a property', async () => {
+    const mockFile = [
+      {
+        originalname: 'test-image.jpg',
+        buffer: Buffer.from('file content'),
+        mimetype: 'image/jpeg',
+        size: 1024,
+        path: 'uploads\\test-image',
+      },
+      {
+        originalname: 'test-image-two.jpg',
+        buffer: Buffer.from('file content'),
+        mimetype: 'image/jpeg',
+        size: 1024,
+        path: 'uploads\\test-image-two',
+      },
+    ] as Express.Multer.File[];
+
+    // create the file in uploads folder
+    mockFile.forEach((file) => {
+      writeFileSync(file.path, file.buffer);
+    });
+
+    const mockJson = [
+      {
+        photo: 'test-image.jpg',
+        description: 'Photo 1',
+        showInGallery: true,
+        labels: ['bedroom', 'internal'],
+      },
+      {
+        photo: 'test-image-two.jpg',
+        description: 'Photo 2',
+        showInGallery: false,
+        labels: ['living_room', 'internal'],
+      },
+    ] as {
+      photo: string;
+      description?: string;
+      showInGallery?: boolean;
+      labels?: string[];
+    }[];
+
+    const response = await service.uploadPhoto(1, mockFile, mockJson);
+
+    expect(response.error).toBe(false);
+    expect(response.message).toBe('Photos uploaded');
+    expect(response.data.length).toBe(2);
   });
 
   it('should return an error if there is a database issue deleting a property', async () => {
