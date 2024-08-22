@@ -303,6 +303,15 @@ describe('PropertiesController', () => {
     expect(response.data.length).toBe(2);
   });
 
+  it('should persist the photos in the database', async () => {
+    const photos = await repository.findOne({
+      where: { id: savedProperty.id },
+      relations: ['photos'],
+    });
+
+    expect(photos.photos.length).toBe(2);
+  });
+
   it('should return an error if there is a database issue deleting a property', async () => {
     jest
       .spyOn(repository, 'delete')
