@@ -16,6 +16,8 @@ import { ConflictException } from '@nestjs/common';
 import { Profile } from '../entities/profile.entity';
 import { Property } from '../../properties/entities/property.entity';
 import { PropertyPhotos } from '../../properties/entities/property-photos.entity';
+import { Labels } from '../../properties/entities/labels.entity';
+import { PhotoLabels } from '../../properties/entities/photo-labels.entity';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -36,7 +38,14 @@ describe('UsersController', () => {
           username: process.env.DB_USER,
           password: process.env.DB_PASSWORD,
           database: 'inrent-test',
-          entities: [User, Profile, Property, PropertyPhotos],
+          entities: [
+            User,
+            Profile,
+            Property,
+            PropertyPhotos,
+            Labels,
+            PhotoLabels,
+          ],
           synchronize: true,
         } as TypeOrmModuleOptions),
         TypeOrmModule.forFeature([User]),
