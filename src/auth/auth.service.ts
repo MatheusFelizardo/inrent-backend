@@ -2,7 +2,6 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { error } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -52,5 +51,19 @@ export class AuthService {
     return {
       access_token: await this.jwtService.signAsync(payload),
     };
+  }
+
+  async verifyToken(token: string): Promise<any> {
+    try {
+      const decoded = this.jwtService.verify(token);
+      return decoded;
+    } catch (error) {
+      console.log(error.message);
+      // throw new UnauthorizedException({
+      //   error: true,
+      //   message: 'Invalid token',
+      //   data: null,
+      // });
+    }
   }
 }
