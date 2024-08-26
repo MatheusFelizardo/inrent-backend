@@ -16,14 +16,9 @@ import { MessagesModule } from './messages/messages.module';
 import { PaymentsModule } from './payments/payments.module';
 import { DashboardsModule } from './dashboards/dashboards.module';
 
-// Entities
-import { User } from './users/entities/user.entity';
-import { Property } from './properties/entities/property.entity';
-import { PropertyPhotos } from './properties/entities/property-photos.entity';
-import { Profile } from './users/entities/profile.entity';
-import { Labels } from './properties/entities/labels.entity';
-import { PhotoLabels } from './properties/entities/photo-labels.entity';
+// Datasource
 import { dataSourceOptions } from './db/data-source';
+import { MessagesGateway } from './messages/messages.gatway';
 
 @Module({
   imports: [
@@ -50,6 +45,7 @@ import { dataSourceOptions } from './db/data-source';
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
+    MessagesGateway,
   ],
 })
 export class AppModule {}
